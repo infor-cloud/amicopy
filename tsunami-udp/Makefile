@@ -4,4 +4,4 @@ clean:
 	rm -f tsunami tsunamid
 
 tsunami tsunamid:
-	build_tsunami-udp.py
+	./build_tsunami-udp.py

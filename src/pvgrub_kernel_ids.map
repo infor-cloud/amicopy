@@ -1,0 +1,10 @@
+{ 
+'us-east-1': 'aki-88aa75e1',
+'us-west-1': 'aki-f77e26b2',
+'us-west-2': 'aki-fc37bacc',
+'eu-west-1': 'aki-71665e05',
+'ap-southeast-1': 'aki-fe1354ac',
+'ap-northeast-1': 'aki-44992845',
+'sa-east-1': 'aki-c48f51d9',
+'us-gov-west-1': 'aki-79a4c05a',
+}
