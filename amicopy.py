@@ -59,15 +59,9 @@ def generate_secret(length = 1024, encode = True):
 
     return secret
 
-def load_file(filename, evaluate = True, base64 = False):
-    '''Load a file and return the (optionally) evaluated and encoded contents'''
-    f = open(filename).read()
-    if evaluate:
-        return eval(f)
-    else:
-        if base64:
-            f = b64encode(f)
-        return f
+def load_file(filename)
+    '''Load a file and return contents'''
+    return open(filename).read()
 
 def check(condition, error_msg):
     '''Check a condition and raise an exception if it's not met'''
@@ -117,20 +111,78 @@ def ec2_connect(region, *args, **kwargs):
 # Constants
 ###############################################################################
 #TODO: move this to other files?
-amazon_linux_ebs_64 = load_file('src/amazon_linux_ebs_64.map')
+amazon_linux_ebs_64 = { 'us-east-1': 'ami-aecd60c7',
+                        'us-west-2': 'ami-48da5578',
+                        'us-west-1': 'ami-734c6936',
+                        'eu-west-1': 'ami-6d555119',
+                        'ap-southeast-1': 'ami-3c0b4a6e',
+                        'ap-northeast-1': 'ami-2819aa29',
+                        'sa-east-1': 'ami-fe36e8e3',
+                        'us-gov-west-1': 'ami-e9a1c5ca',
+                        }
 
-pvgrub_kernel_ids = load_file('src/pvgrub_kernel_ids.map')
+pvgrub_kernel_ids = { 'us-east-1': 'aki-88aa75e1',
+                      'us-west-1': 'aki-f77e26b2',
+                      'us-west-2': 'aki-fc37bacc',
+                      'eu-west-1': 'aki-71665e05',
+                      'ap-southeast-1': 'aki-fe1354ac',
+                      'ap-northeast-1': 'aki-44992845',
+                      'sa-east-1': 'aki-c48f51d9',
+                      'us-gov-west-1': 'aki-79a4c05a',
+                      }
 
 valid_block_devs = ['/dev/sdf', '/dev/sdg', '/dev/sdh', '/dev/sdi', '/dev/sdj',
                     '/dev/sdk', '/dev/sdl', '/dev/sdm', '/dev/sdn', '/dev/sdo',
                     '/dev/sdp', ]
 
-src_data = load_file('src/source_user_data.sh', False)
+src_data = ''' #!/bin/sh
+set -x; set -e
+cd /media/ephemeral0
+wget --no-check-certificate '%(tsunamid)s' -O tsunamid ; chmod +x tsunamid
 
-dst_data = load_file('src/destination_user_data.sh', False)
+cat > secret.txt << 'EOF'
+%(secret)s
+EOF
 
-tsunamid = b64decode(load_file('tsunami-udp/tsunamid', False, True))
-tsunami = b64decode(load_file('tsunami-udp/tsunami', False, True))
+for DEV in /dev/xvd[f-p] ; do
+    BASE=`basename "$DEV"`
+    dd if="$DEV" bs=1M | openssl enc -e -aes-128-cbc -pass file:secret.txt \
+            > "$BASE".img
+    sha1sum "$BASE".img > "$BASE".img.sha1
+done
+
+./tsunamid --hbtimeout 600 > tsunamid.log'''
+
+dst_data = '''#!/bin/sh
+set -x; set -e
+cd /media/ephemeral0
+wget --no-check-certificate '%(tsunami)s' -O tsunami ; chmod +x tsunami
+
+cat > secret.txt << 'EOF'
+%(secret)s
+EOF
+    
+until nc -z %(source)s 46224 > /dev/null ; do
+    sleep 30
+done
+
+for DEV in /dev/xvd[f-p] ; do
+    BASE=`basename "$DEV"`
+    ./tsunami set rateadjust yes connect %(source)s get "$BASE".img \
+            get "$BASE".img.sha1 exit || true
+done
+
+for DEV in /dev/xvd[f-p] ; do
+    BASE=`basename "$DEV"`
+    sha1sum -c "$BASE".img.sha1
+    dd if="$BASE".img bs=1M | openssl enc -d -aes-128-cbc \
+            -pass file:secret.txt > "$DEV"
+done
+
+halt'''
+
+tsunamid = load_file('tsunami-udp/tsunamid')
+tsunami = load_file('tsunami-udp/tsunami')
 
 ###############################################################################
 # Classes
