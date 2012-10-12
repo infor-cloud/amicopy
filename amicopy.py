@@ -110,7 +110,6 @@ def ec2_connect(region, *args, **kwargs):
 ###############################################################################
 # Constants
 ###############################################################################
-#TODO: move this to other files?
 amazon_linux_ebs_64 = { 'us-east-1': 'ami-aecd60c7',
                         'us-west-2': 'ami-48da5578',
                         'us-west-1': 'ami-734c6936',
@@ -135,7 +134,7 @@ valid_block_devs = ['/dev/sdf', '/dev/sdg', '/dev/sdh', '/dev/sdi', '/dev/sdj',
                     '/dev/sdk', '/dev/sdl', '/dev/sdm', '/dev/sdn', '/dev/sdo',
                     '/dev/sdp', ]
 
-src_data = ''' #!/bin/sh
+src_data = '''#!/bin/sh
 set -x; set -e
 cd /media/ephemeral0
 wget --no-check-certificate '%(tsunamid)s' -O tsunamid ; chmod +x tsunamid
@@ -348,7 +347,6 @@ try:
     bucket = s3con.create_bucket(args.name)
     cleanup.add(bucket, 'delete', 'Removing S3 bucket: %s' % args.name)
 
-    # TODO: include tsunami binaries in this file
     info('Uploading tsunamid to %s', args.name)
     key = bucket.new_key('tsunamid')
     key.set_contents_from_string(tsunamid)
