@@ -59,7 +59,7 @@ def generate_secret(length = 1024, encode = True):
 
     return secret
 
-def load_file(filename)
+def load_file(filename):
     '''Load a file and return contents'''
     return open(filename).read()
 
