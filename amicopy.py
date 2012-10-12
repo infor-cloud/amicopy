@@ -110,15 +110,16 @@ def ec2_connect(region, *args, **kwargs):
 ###############################################################################
 # Constants
 ###############################################################################
-amazon_linux_ebs_64 = { 'us-east-1': 'ami-aecd60c7',
-                        'us-west-2': 'ami-48da5578',
-                        'us-west-1': 'ami-734c6936',
-                        'eu-west-1': 'ami-6d555119',
-                        'ap-southeast-1': 'ami-3c0b4a6e',
-                        'ap-northeast-1': 'ami-2819aa29',
-                        'sa-east-1': 'ami-fe36e8e3',
-                        'us-gov-west-1': 'ami-e9a1c5ca',
-                        }
+amazon_linux_ebs_64 = { 
+        'us-east-1':            'ami-1624987f',
+        'us-west-2':            'ami-2a31bf1a',
+        'us-west-1':            'ami-1bf9de5e',
+        'eu-west-1':            'ami-c37474b7',
+        'ap-southeast-1':       'ami-a6a7e7f4',
+        'ap-northeast-1':       'ami-4e6cd34f',
+        'sa-east-1':            'ami-1e08d103',
+        'us-gov-west-1':        'ami-21a9cd02',
+        }
 
 pvgrub_kernel_ids = { 'us-east-1': 'aki-88aa75e1',
                       'us-west-1': 'aki-f77e26b2',
