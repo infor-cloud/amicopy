@@ -36,23 +36,23 @@ Building amicopy is not terribly hard, but you will need access to AWS to build
 Tsunami UDP. Basically the build procedure builds the Tsunami binaries on AWS
 and then includes them
 
-# Make sure that boto can connect correctly without providing credentials
-  directly. See http://docs.pythonboto.org/en/latest/boto_config_tut.html or
-  use the AWS_CREDENTIAL_FILE variable to point to your credential file.
-  You can test connectivity with the following code. If you don't get an
-  exception, your connection should be working.
+1. Make sure that boto can connect correctly without providing credentials
+   directly. See http://docs.pythonboto.org/en/latest/boto_config_tut.html or
+   use the AWS_CREDENTIAL_FILE variable to point to your credential file.
+   You can test connectivity with the following code. If you don't get an
+   exception, your connection should be working.
 
-  ```python
-  from boto.ec2.connection import EC2Connection
-  e = EC2Connection()
-  
-  ```
-# Grab the code from github
-# Run make
+   ```python
+   from boto.ec2.connection import EC2Connection
+   e = EC2Connection()
+   
+   ```
+2. Grab the code from github
+3. Run make
 
-  ```bash
-  make
-  ```
+   ```bash
+   make
+   ```
 
 Future Improvements
 -------------------
