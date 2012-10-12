@@ -1,6 +1,5 @@
 amicopy
 =======
-
 amicopy is a Python script that copies EBS AMIs between regions. It uses a
 similar methodology to copy EBS volumes that Amigo (AWS's unsupported AMI
 copy tool) does, but is much simpler to use.
@@ -28,6 +27,63 @@ https://github.com/infor-cloud/amicopy/downloads
 
 Running amicopy
 ---------------
+Running amicopy differs slightly depending on the OS you are using. The basic
+syntax is:
+
+UNIX: ```./amicopy SOURCEAMI SOURCEREGION DESTINATIONREGION```
+Windows: ```c:\Python\Python.exe amicopy SOURCEAMI SOURCEREGION 
+DESTINATIONREGION```
+
+Note: Examples will show be shown on a UNIX version, but the actual command
+line syntax applies to both.
+
+Example:
+```bash
+./amicopy -v ami-123456 us-east-1 us-west-1
+```
+
+### Windows AMIs
+Because of how Amazon charges for Windows AMIs, the process for copying the
+AMI requires a couple extra steps. amicopy handles these steps for you, but
+it requires an extra parameter, the destination AMI.
+
+To determine the destination AMI, find an AMI in the destination region that
+matches the AMI you're trying to copy. For example, if you're trying to copy
+an AMI runing Windows 2008 R2 Base, you'll look for the AMI ID of the 
+Amazon-provided Windows 2008 R2 Base AMI.
+
+**The destination AMI architecture (32 or 64 bit) must match the source AMI
+  architecture.**
+
+Use the ```--dst-ami``` command line option to specify the destination AMI.
+
+Example:
+```bash
+./amicopy ami-123456 us-east-1 us-west-1 --dst-ami ami-635d7926 
+```
+
+### Other Command Line Options
+* ```--verbose``` Turns on verbose output. This option is highly recommended.
+* ```--dst-ami``` Specifies the Windows AMI to use in the destination region
+  to generate the new AMI.
+* ```--src-key``` AWS access key id for source account
+* ```--src-secret``` AWS secret key for source account
+* ```--dst-key``` AWS access key id for destination account
+* ```--dst-secret``` AWS secret key for destination account
+* ```--key-size``` Length of the key to use to encrypt the EBS volumes during
+  the transfer. Default: 2048.
+* ```--inst-type``` Type of instance to use. **Note**: Using an instance type
+   smaller thatn m1.large (the default) will slow down the
+   transfer, since smaller instance types have lower network throttle values.
+* ```--name``` Tag and/or name to use for temporary AWS objects. Default: 
+  amicopy + timestamp
+* ```--kernel-id``` AKI to use for destination AMI
+* ```--src-keypair``` Keypair to use for source instance. Typically only need 
+  to debug.
+* ```--dst-keypair``` Keypair to use for destination instance. Typically only
+  need to debug.
+* ```--debug``` turns on debugging output. This generates a **lot** of output.
+  Be sure to redirect it to a file.
 
 
 Building amicopy
