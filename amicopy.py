@@ -110,6 +110,10 @@ def ec2_connect(region, *args, **kwargs):
 ###############################################################################
 # Constants
 ###############################################################################
+version = '0.2'
+version_txt = ('amicopy version %s Copyright (c) 2012 by David Lowry.' 
+              + ' BSD License') % version
+
 amazon_linux_ebs_64 = { 
         'us-east-1':            'ami-1624987f',
         'us-west-2':            'ami-2a31bf1a',
@@ -219,25 +223,12 @@ parser.add_argument('dst_region', metavar = 'DESTINATION',
                     help = 'destination region for new AMI')
 
 # Options
-# TODO: sort options
-parser.add_argument('--key-size', type = int, default = 2048,
-                    help = 'length of the secret key used to encrypt the'
-                           + ' image (default: %(default)s)')
-parser.add_argument('--inst-type', default = 'm1.large',
-                    help = 'instance type for transfer instances'
-                           + ' (default: %(default)s)')
-parser.add_argument('--name', default = ('amicopy' 
-                        + datetime.now().strftime('%Y%m%d%H%M%S')),
-                    help = 'name/tag to use for temporary object (default:'
-                           + ' amicopy + timestamp)')
-parser.add_argument('--kernel-id',
-                    help = 'AKI to use in destination region')
+parser.add_argument('-v', '--verbose', action = 'store_true', default = False,
+                    help = 'turn on verbose output')
+
 parser.add_argument('--dst-ami',
                     help = 'Destination AMI to use for Windows AMIs')
-parser.add_argument('--src-keypair',
-                    help = 'keypair in source region')
-parser.add_argument('--dst-keypair',
-                    help = 'keypair in destination region')
+
 parser.add_argument('--src-key',
                     help = 'access key id for source account')
 parser.add_argument('--src-secret',
@@ -249,13 +240,32 @@ parser.add_argument('--dst-secret',
                     help = 'secret key for destination account (default: '
                            + ' same as destination account)')
 
+parser.add_argument('--kernel-id',
+                    help = 'AKI to use in destination region')
+
+parser.add_argument('--key-size', type = int, default = 2048,
+                    help = 'length of the secret key used to encrypt the'
+                           + ' image (default: %(default)s)')
+parser.add_argument('--inst-type', default = 'm1.large',
+                    help = 'instance type for transfer instances'
+                           + ' (default: %(default)s)')
+parser.add_argument('--name', default = ('amicopy' 
+                        + datetime.now().strftime('%Y%m%d%H%M%S')),
+                    help = 'name/tag to use for temporary object (default:'
+                           + ' amicopy + timestamp)')
+parser.add_argument('--src-keypair',
+                    help = 'keypair in source region')
+parser.add_argument('--dst-keypair',
+                    help = 'keypair in destination region')
 parser.add_argument('-d', '--debug', action = 'store_true', default = False,
                     help = 'turn on debugging output (warning: generates a lot'
                            + ' of output)')
-parser.add_argument('-v', '--verbose', action = 'store_true', default = False,
-                    help = 'turn on verbose output')
+parser.add_argument('-V', '--version', action = 'version',
+                    version = version_txt,
+                    help = 'print version information')
 
 args = parser.parse_args()
+
 if args.dst_key == None: args.dst_key = args.src_key
 if args.dst_secret == None: args.dst_secret = args.src_secret
 
@@ -565,7 +575,11 @@ try:
         sleep(30)
         ami.update()
 
-    # TODO: Tag AMI
+    info('Tagging AMI')
+    t = ec2src.get_all_tags(filters = {'resource-id': src_ami.id, 
+                                       'key': 'Name'})
+    if len(t) == 1:
+        ec2dst.create_tags([ami.id], {'Name': t[0].value})
 
 except (Exception, KeyboardInterrupt) as e:
     exception('Cleaning up because of error')
@@ -573,16 +587,8 @@ except (Exception, KeyboardInterrupt) as e:
         cleanup.cleanup()
     except Exception, ce:
         exception('Error during cleanup')
+    print 'AMI Copy Failed!'
 else:
     cleanup.cleanup()
     print 'AMI Copy Complete: %s' % ami.id
-
-
-# Create the instances
-# Configure the security groups
-
-###############################################################################
-# Clean up
-###############################################################################
-# Don't clean up if the no-cleanup flag is set
 
