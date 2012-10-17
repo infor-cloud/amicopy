@@ -110,7 +110,7 @@ def ec2_connect(region, *args, **kwargs):
 ###############################################################################
 # Constants
 ###############################################################################
-version = '0.2'
+version = '0.3'
 version_txt = ('amicopy version %s Copyright (c) 2012 by David Lowry.' 
               + ' BSD License') % version
 
@@ -140,6 +140,9 @@ valid_block_devs = ['/dev/sdf', '/dev/sdg', '/dev/sdh', '/dev/sdi', '/dev/sdj',
                     '/dev/sdp', ]
 
 src_data = '''#!/bin/sh
+
+cat << 'SRCEOF' > /media/ephemeral0/amicopy_src.sh
+#!/bin/sh
 set -x; set -e
 cd /media/ephemeral0
 wget --no-check-certificate '%(tsunamid)s' -O tsunamid ; chmod +x tsunamid
@@ -155,9 +158,17 @@ for DEV in /dev/xvd[f-p] ; do
     sha1sum "$BASE".img > "$BASE".img.sha1
 done
 
-./tsunamid --hbtimeout 600 > tsunamid.log'''
+./tsunamid --hbtimeout 600 > tsunamid.log
+SRCEOF
+
+chmod +x /media/ephemeral0/amicopy_src.sh
+
+/media/ephemeral0/amicopy_src.sh > /media/ephemeral0/amicopy.log 2>&1
+'''
 
 dst_data = '''#!/bin/sh
+
+cat << 'DSTEOF' > /media/ephemeral0/amicopy_dst.sh
 set -x; set -e
 cd /media/ephemeral0
 wget --no-check-certificate '%(tsunami)s' -O tsunami ; chmod +x tsunami
@@ -183,7 +194,14 @@ for DEV in /dev/xvd[f-p] ; do
             -pass file:secret.txt > "$DEV"
 done
 
-halt'''
+halt
+DSTEOF
+
+chmod +x /media/ephemeral0/amicopy_dst.sh
+
+/media/ephemeral0/amicopy_dst.sh > /media/ephemeral0/amicopy.log 2>&1
+
+'''
 
 tsunamid = load_file('tsunami-udp/tsunamid')
 tsunami = load_file('tsunami-udp/tsunami')
