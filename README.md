@@ -63,7 +63,8 @@ Example:
 ```
 
 ### Other Command Line Options
-* ```--verbose``` Turns on verbose output. This option is highly recommended.
+* ```-v```, ```--verbose``` Turns on verbose output. This option is highly 
+  recommended.
 * ```--dst-ami``` Specifies the Windows AMI to use in the destination region
   to generate the new AMI.
 * ```--src-key``` AWS access key id for source account
@@ -82,9 +83,30 @@ Example:
   to debug.
 * ```--dst-keypair``` Keypair to use for destination instance. Typically only
   need to debug.
-* ```--debug``` turns on debugging output. This generates a **lot** of output.
+* ```-d```, ```--debug``` turns on debugging output. This generates a **lot** 
+  of output.
   Be sure to redirect it to a file.
 
+Troubleshooting
+---------------
+The most likely problem is that the copy will appear to hang. This is because
+amicopy is dependent on the source and destination instances to complete
+the EBS volume copy successfully before continuing. If the process gets stuck,
+CTRL-C will cancel the copy and the script will clean up any temporary objects.
+
+Here are some further tips for troubleshooting:
+* Always run in verbose (```--verbose``` or ```-v```) mode in order to be
+  able to see what the script is doing.
+* If amicopy gets stuck at this message, ```Waiting for destination instance 
+  to shutdown```, you will need to log into the instances and check the user
+  data script logs.
+* Use ```--src-keypair``` and  ```--dst-keypair``` to specify SSH keypairs
+  to allow you to log into the source and destination images.
+* Check the amicopy logs. They are located at
+  ```/media/ephemeral0/amicopy.log``` on each server.
+* If amicopy fails with an unexpected error, use ```--debug``` to turn on extra
+  boto and AWS API information. Be sure to redirect the output to a file,
+  since this option will generate *a lot* of information.
 
 Building amicopy
 ----------------
