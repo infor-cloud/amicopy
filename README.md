@@ -10,6 +10,9 @@ Be aware that using amicopy will generate both transfer fees and costs
 associated with running instances in both the source and destination regions
 during the copy.
 
+*Note:* amicopy is still in beta and may not copy AMIs succuessfully. Please
+report any bugs you find.
+
 License
 -------
 amicopy is released under the BSD license. See LICENSE.txt for more details.
