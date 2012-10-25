@@ -110,7 +110,7 @@ def ec2_connect(region, *args, **kwargs):
 ###############################################################################
 # Constants
 ###############################################################################
-version = '0.3'
+version = '0.4'
 version_txt = ('amicopy version %s Copyright (c) 2012 by David Lowry.' 
               + ' BSD License') % version
 
@@ -286,9 +286,6 @@ args = parser.parse_args()
 
 if args.dst_key == None: args.dst_key = args.src_key
 if args.dst_secret == None: args.dst_secret = args.src_secret
-
-check(args.src_region != args.dst_region,
-      'source and destination regions must be different')
 
 ###############################################################################
 # Variables
@@ -483,8 +480,10 @@ try:
     # Set up security groups for Tsunami
     info('Allowing TCP access to source instance for tsunamid')
     src_sg.authorize('tcp', 46224, 46224, dst_inst.ip_address + '/32')
+    src_sg.authorize('tcp', 46224, 46224, dst_inst.private_ip_address + '/32')
     info('Allowing UDP access to destination instance for tsunami')
     dst_sg.authorize('udp', 46224, 46224, src_inst.ip_address + '/32')
+    dst_sg.authorize('udp', 46224, 46224, src_inst.private_ip_address + '/32')
 
     # Wait for copy to finish
     info('Waiting for destination instance to shutdown')

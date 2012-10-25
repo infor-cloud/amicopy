@@ -137,11 +137,6 @@ and then includes them
 
 Future Improvements
 -------------------
-* Allow copy between accounts
-
-  This should be pretty easy, since the only thing preventing it right now is
-  the check that keeps you from copying to the same region.
-
 * Rewrite the snapshot tracking code
 
   Right now it's way too complicated and prone to errors. It also makes things
