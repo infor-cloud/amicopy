@@ -1,10 +1,22 @@
+
+
+
+Deprecation Notice
+==================
+Since AWS has added the ability to copy AMIs between regions directly to the
+API, this project is being deprecated. It will probably be archived and removed
+in the near future.
+
+
+
+
 amicopy
 =======
 amicopy is a Python script that copies EBS AMIs between regions. It uses a
 similar methodology to copy EBS volumes that Amigo (AWS's unsupported AMI
 copy tool) does, but is much simpler to use.
 
-It uses Tsunami UDP to do a fast transfer bet
+It uses Tsunami UDP to do a fast transfer.
 
 Be aware that using amicopy will generate both transfer fees and costs
 associated with running instances in both the source and destination regions
